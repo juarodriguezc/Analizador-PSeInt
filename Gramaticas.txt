@@ -1,0 +1,41 @@
+
+---------------------------------------------------------------------------------------------------------
+"  v1      gramática
+
+"S -> FUN_SUB_ALGPRO MAIN FUN_SUB_ALGPRO \n" +
+"FUN_SUB_ALGPRO -> FUNCION FUN_SUB_ALGPRO \n" +
+"FUN_SUB_ALGPRO -> e \n" +
+
+"FUNCION -> HEADER_FUNCION BODY_FUNCION END_FUNCION \n" +
+
+"HEADER_FUNCION -> TOK_FUNCION RETURN_FUNCION id PARAMETERS \n" +
+
+"TOK_FUNCION -> funcion \n" +
+"TOK_FUNCION -> subalgoritmo \n" +
+"TOK_FUNCION -> subproceso \n" +
+
+"RETURN_FUNCION -> id token_asig \n" +
+"RETURN_FUNCION -> e \n" +
+
+"PARAMETERS -> token_par_izq PARAMS token_par_der \n" +
+"PARAMETERS -> e \n" +
+
+"PARAMS -> id PARAMS_ \n" +
+"PARAMS_ -> token_coma PARAMS \n" +
+"PARAMS_ -> e \n" +
+
+"BODY_FUNCION -> id \n" +
+
+"END_FUNCION -> finfuncion \n" +
+"END_FUNCION -> finsubalgoritmo \n" +
+"END_FUNCION -> finsubproceso \n"
+
+
+
+
+"
+SubProceso ans <- doble(x)
+    ans
+FinSubProceso
+
+---------------------------------------------------------------------------------------------------------

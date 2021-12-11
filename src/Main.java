@@ -19,6 +19,8 @@ class Token {
         put("finfuncion" , "finfuncion");
         put("subproceso" , "subproceso");
         put("finsubproceso" , "finsubproceso");
+        put("subalgoritmo" , "subalgoritmo");
+        put("finsubalgoritmo" , "finsubalgoritmo");
         put("definir" , "definir");
         put("como" , "como");
         put("numerico" , "numerico");
@@ -94,8 +96,13 @@ class Token {
         put("]" , "token_cor_der");
         put("," , "token_coma");
         put("^" , "token_pot");
-
-
+        //EOF
+        put("$" , "$");
+        //Test
+        put("uno" , "uno");
+        put("dos" , "dos");
+        put("tres" , "tres");
+        put("cuatro" , "cuatro");
     }};
 
     public Token(String  tipo, int fila, int columna) {
@@ -146,6 +153,7 @@ class LexAn {
             result.addAll(analizeLine(line, i));
         }
         tokenList = result;
+        tokenList.add(new Token("$",0,0));
         return tokenList;
     }
 
@@ -455,6 +463,10 @@ class LexAn {
             System.out.println(tok.toString());
         }
     }
+
+    public ArrayList<Token> getTokenList() {
+        return tokenList;
+    }
 }
 
 class PredLine{
@@ -479,16 +491,10 @@ class Grammar{
     //Mayuscula no terminales
     //Minuscula terminales
     private String grammar =
-            "S -> A B uno \n"+
-            "A -> dos B \n"+
-            "A -> e \n"+
-            "B -> C D \n"+
+            "A -> B uno $ \n"+
+            "A -> dos $ \n"+
             "B -> tres \n"+
-            "B -> e \n"+
-            "C -> cuatro A B \n"+
-            "C -> cinco \n"+
-            "D -> seis \n"+
-            "D -> e \n"
+            "B -> cuatro A\n"
             ;
 
 
@@ -504,7 +510,6 @@ class Grammar{
     }
 
     public void analizeGrammar(){
-        //pred = new ArrayList<>(grammar)
         String[] gramm = grammar.split("\n");
         //Crear arreglo de objetos de prediccion
         pred = new PredLine[gramm.length];
@@ -523,14 +528,14 @@ class Grammar{
         //Crear arreglo de siguientes
         Object[] arr = noTers.toArray();
         sigs = new PredLine[arr.length];
-        //System.out.println(arr.length);
         for(int i = 0; i< arr.length; i++){
             sigs[i] = new PredLine(arr[i].toString().trim());
         }
         for (int i = 0; i < gramm.length; i++){
             //Pos 0 - No terminal  Pos 2 - n  Alpha
-            //pred[i].pred = Primeros(transGrammar[i],2);
+            /*pred[i].pred = Primeros(transGrammar[i],2);
             //pred[i].pred = Siguientes(transGrammar[i][0], new HashSet<String>());
+            */
             pred[i].pred = Pred(transGrammar[i]);
         }
         //Imprimir resultados
@@ -554,13 +559,11 @@ class Grammar{
         HashSet<String> prim = new HashSet<>();
         if(line[indStart].equals("e")){
             prim.add("e");
-            //System.out.println("CONDICION 1");
             return prim;
         }
         //Revisa si se trata de un no terminal-Mayuscula o terminal-Minuscula
         if(isLowerCase(line[indStart])){
             prim.add(line[indStart]);
-            //System.out.println("CONDICION 2-a");
             return prim;
         }
         else{
@@ -662,7 +665,6 @@ class Grammar{
                     }
                 }
             }
-            //System.out.println("Temp sigui: "+sigs[index].pred);
         }
         //System.out.println("Sig( "+noTer+" ) = "+sigs[index].pred);
         //System.out.println("----------------");
@@ -676,8 +678,96 @@ class Grammar{
         return true;
     }
 
+    public PredLine[] getPred() {
+        return pred;
+    }
+
+    public String[][] getTransGrammar() {
+        return transGrammar;
+    }
+
+    public HashSet<String> getNoTers() {
+        return noTers;
+    }
 }
 
+class SintAn {
+    private String[][] grammar;
+    private PredLine[] pred;
+    private ArrayList<Token> tokenList;
+
+    private int index;
+
+    public SintAn(String[][] grammar, PredLine[] pred, ArrayList<Token> tokenList) {
+        this.grammar = grammar;
+        this.pred = pred;
+        this.tokenList = tokenList;
+        index = 0;
+    }
+
+    public void analizeSintax(){
+        if(tokenList.size() > 0){
+            funcion("A");
+            System.out.println("TOken: "+tokenList.get(index));
+            if(!tokenList.get(index).tipo.equals("$")){
+                errorSintaxis(tokenList.get(index).tipo);
+            }
+            System.out.println("El analisis sintactico ha finalizado exitosamente.");
+            System.out.println(tokenList.get(index));
+
+        }
+    }
+
+    public void funcion(String noTer){
+        Token tok = tokenList.get(index);
+        boolean contains = false;
+        for(int i=0; i<grammar.length; i++){
+            if(grammar[i][0].equals(noTer)){
+                if(pred[i].pred.contains(tok.tipo)){
+                    contains = true;
+                    for(int j=2; j<grammar[i].length; j++){
+                        if(isLowerCase(grammar[i][j])){
+                            emparejar(grammar[i][j]);
+                        }else{
+                            funcion(grammar[i][j]);
+                        }
+                    }
+                }
+
+                System.out.println("  Pred: "+pred[i].pred);
+            }
+        }
+
+        if(!contains)errorSintaxis(tok.tipo);
+    }
+
+    public void emparejar(String tokEsperado){
+        Token tok = tokenList.get(index);
+        System.out.println("Index: "+index+ " MaxIndex: "+(tokenList.size()-1));
+        System.out.println("Se esperaba: '"+tokEsperado+"'   -    se recibio: '"+tok.tipo+"'");
+        if(tok.tipo.equals(tokEsperado)){
+            //Get next token
+            if(index < tokenList.size()-1)index = index+1;
+        }else{
+
+            errorSintaxis(tok.tipo);
+        }
+    }
+
+    public void errorSintaxis(String token){
+        System.out.println("Error sintaxis");
+        System.out.println("Token recibido: "+token);
+        System.exit(0);
+    }
+
+    public boolean isLowerCase (String str){
+        char[] charArray = str.toCharArray();
+        for(int i = 0; i < charArray.length; i++){
+            if(!Character.isLowerCase( charArray[i])) return false;
+        }
+        return true;
+    }
+}
 public class Main {
     public static void main(String[] args){
         Scanner scanner = new Scanner(System.in);
@@ -696,7 +786,15 @@ public class Main {
         //Syntax analizer
         System.out.println("El analisis sintactico ha finalizado exitosamente.");
         Grammar gram = new Grammar();
-        //gram.printGrammar();
+        gram.printGrammar();
         gram.analizeGrammar();
+
+        System.out.println(gram.getNoTers());
+
+        SintAn sintax = new SintAn(gram.getTransGrammar(), gram.getPred(), lexical.getTokenList());
+        sintax.analizeSintax();
+
+
+
     }
 }
