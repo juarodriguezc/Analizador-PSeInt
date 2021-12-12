@@ -153,7 +153,8 @@ class LexAn {
             result.addAll(analizeLine(line, i));
         }
         tokenList = result;
-        tokenList.add(new Token("$",0,0));
+        Token temp = tokenList.get(tokenList.size()-1);
+        tokenList.add(new Token("$",temp.fila+1,1));
         return tokenList;
     }
 
@@ -491,10 +492,24 @@ class Grammar{
     //Mayuscula no terminales
     //Minuscula terminales
     private String grammar =
-            "A -> B uno $ \n"+
-            "A -> dos $ \n"+
-            "B -> tres \n"+
-            "B -> cuatro A\n"
+            "S -> TOK_FUNCION RETURN_FUNCION BODY_FUNCION END_FUNCION\n" +
+
+            "TOK_FUNCION -> funcion \n" +
+            "TOK_FUNCION -> subalgoritmo \n" +
+            "TOK_FUNCION -> subproceso \n" +
+
+            "RETURN_FUNCION -> id RETURN_FUNCION_ \n" +
+            "RETURN_FUNCION_ -> token_asig id \n" +
+            "RETURN_FUNCION_ -> e \n" +
+
+            "BODY_FUNCION -> entonces \n" +
+
+            "END_FUNCION -> finfuncion \n" +
+            "END_FUNCION -> finsubalgoritmo \n" +
+            "END_FUNCION -> finsubproceso \n"
+
+
+
             ;
 
 
@@ -673,7 +688,8 @@ class Grammar{
     public boolean isLowerCase (String str){
         char[] charArray = str.toCharArray();
         for(int i = 0; i < charArray.length; i++){
-            if(!Character.isLowerCase( charArray[i])) return false;
+            if(charArray[i] == '_'){}
+            else if(!Character.isLowerCase( charArray[i])) return false;
         }
         return true;
     }
@@ -707,9 +723,10 @@ class SintAn {
 
     public void analizeSintax(){
         if(tokenList.size() > 0){
-            funcion("A");
+            funcion("S");
             System.out.println("TOken: "+tokenList.get(index));
             if(!tokenList.get(index).tipo.equals("$")){
+                System.out.println("Error de terminal");
                 errorSintaxis(tokenList.get(index).tipo);
             }
             System.out.println("El analisis sintactico ha finalizado exitosamente.");
@@ -721,49 +738,82 @@ class SintAn {
     public void funcion(String noTer){
         Token tok = tokenList.get(index);
         boolean contains = false;
+        HashSet<String> esperados = new HashSet<>();
         for(int i=0; i<grammar.length; i++){
             if(grammar[i][0].equals(noTer)){
+                /*
+                System.out.println("No terminal base: "+grammar[i][0]+" ->   "+ pred[i].pred);
+                System.out.println("A buscar: "+tok.tipo);
+                System.out.println("Contiene: "+pred[i].pred.contains(tok.tipo));
+                System.out.println();
+                 */
+                esperados.addAll(pred[i].pred);
                 if(pred[i].pred.contains(tok.tipo)){
                     contains = true;
                     for(int j=2; j<grammar[i].length; j++){
-                        if(isLowerCase(grammar[i][j])){
+                        if(grammar[i][j].equals("e")){}
+                        else if(isLowerCase(grammar[i][j])){
                             emparejar(grammar[i][j]);
                         }else{
                             funcion(grammar[i][j]);
                         }
                     }
                 }
-
-                System.out.println("  Pred: "+pred[i].pred);
             }
         }
-
-        if(!contains)errorSintaxis(tok.tipo);
+        System.out.println("Contains: "+contains+ " No terminal: "+noTer+" recibido: "+tok.tipo);
+        if(!contains){
+            //System.out.println("Error no se contiene el no terminal");
+            errorSintaxis(tok, esperados);
+        }
     }
 
     public void emparejar(String tokEsperado){
         Token tok = tokenList.get(index);
+        System.out.println();
         System.out.println("Index: "+index+ " MaxIndex: "+(tokenList.size()-1));
         System.out.println("Se esperaba: '"+tokEsperado+"'   -    se recibio: '"+tok.tipo+"'");
         if(tok.tipo.equals(tokEsperado)){
             //Get next token
+            System.out.println("Correcto");
+            System.out.println();
             if(index < tokenList.size()-1)index = index+1;
         }else{
-
-            errorSintaxis(tok.tipo);
+            System.out.println("Error de emparejamiento");
+            errorSintaxis(tok, tokEsperado);
         }
     }
-
+    //Error de sintaxis fin de archivo
     public void errorSintaxis(String token){
-        System.out.println("Error sintaxis");
-        System.out.println("Token recibido: "+token);
+        System.out.print(" Error sintactico: se encontro: "+token);
         System.exit(0);
     }
+
+    //Error de sintaxis no coincidencia funcion
+    public void errorSintaxis(Token tok, HashSet<String> esperados){
+        String newTok = tok.tipo;
+        if(tok.tipo.equals("$"))newTok = "EOF";
+        ArrayList<String> esperados_list = new ArrayList<>(esperados);
+        System.out.print("<"+tok.fila+","+tok.columna+"> Error sintactico: se encontro: \""+newTok+"\"; se esperaba: ");
+        for(int i=0; i<esperados_list.size(); i++){
+            if(i == esperados_list.size()-1) System.out.print("\""+esperados_list.get(i)+"\".");
+            else System.out.print("\""+esperados_list.get(i)+"\", ");
+        }
+        System.exit(0);
+    }
+
+    //Error de sintaxis no coincidencia emparejar
+    public void errorSintaxis(Token tok, String token){
+        System.out.print("<"+tok.fila+","+tok.columna+"> Error sintactico: se encontro: \""+token+"\"; se esperaba: \""+tok.tipo+"\".");
+        System.exit(0);
+    }
+
 
     public boolean isLowerCase (String str){
         char[] charArray = str.toCharArray();
         for(int i = 0; i < charArray.length; i++){
-            if(!Character.isLowerCase( charArray[i])) return false;
+            if(charArray[i] == '_'){}
+            else if(!Character.isLowerCase( charArray[i])) return false;
         }
         return true;
     }
@@ -776,7 +826,6 @@ public class Main {
         while (scanner.hasNextLine())
         {
             String line = scanner.nextLine();
-            if(line.equals("ñ"))break;
             lineList.add(line);
         }
         scanner.close();
@@ -786,6 +835,7 @@ public class Main {
         //Syntax analizer
         System.out.println("El analisis sintactico ha finalizado exitosamente.");
         Grammar gram = new Grammar();
+
         gram.printGrammar();
         gram.analizeGrammar();
 

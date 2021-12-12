@@ -34,8 +34,39 @@
 
 
 "
+"Ejemplo de prueba"
 SubProceso ans <- doble(x)
     ans
 FinSubProceso
 
 ---------------------------------------------------------------------------------------------------------
+"  v2      gramática
+
+"S -> TOK_FUNCION RETURN_FUNCION BODY_FUNCION END_FUNCION\n" +
+
+"TOK_FUNCION -> funcion \n" +
+"TOK_FUNCION -> subalgoritmo \n" +
+"TOK_FUNCION -> subproceso \n" +
+
+"RETURN_FUNCION -> id RETURN_FUNCION_ \n" +
+"RETURN_FUNCION_ -> token_asig id \n" +
+"RETURN_FUNCION_ -> e \n" +
+
+"BODY_FUNCION -> entonces \n" +
+
+"END_FUNCION -> finfuncion \n" +
+"END_FUNCION -> finsubalgoritmo \n" +
+"END_FUNCION -> finsubproceso \n"
+
+
+
+
+"
+"Ejemplo de prueba"
+SubProceso ans <- axis
+    entonces
+finsubalgoritmo
+
+SubProceso axis
+    entonces
+finsubalgoritmo
