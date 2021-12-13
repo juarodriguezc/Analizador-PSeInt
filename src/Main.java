@@ -97,12 +97,102 @@ class Token {
         put("," , "token_coma");
         put("^" , "token_pot");
         //EOF
-        put("$" , "$");
-        //Test
-        put("uno" , "uno");
-        put("dos" , "dos");
-        put("tres" , "tres");
-        put("cuatro" , "cuatro");
+        put("EOF" , "$");
+        //Token ID
+        //put("id" , "id");
+    }};
+
+    public static Map<String, String> dicTipoRev = new HashMap<String, String>() {{
+        //Palabras reservadas
+        put("algoritmo" , "algoritmo");
+        put("finalgoritmo" , "finalgoritmo");
+        put("proceso" , "proceso");
+        put("finproceso" , "finproceso");
+        put("funcion" , "funcion");
+        put("finfuncion" , "finfuncion");
+        put("subproceso" , "subproceso");
+        put("finsubproceso" , "finsubproceso");
+        put("subalgoritmo" , "subalgoritmo");
+        put("finsubalgoritmo" , "finsubalgoritmo");
+        put("definir" , "definir");
+        put("como" , "como");
+        put("numerico" , "numerico");
+        put("numero" , "numero");
+        put("entero" , "entero");
+        put("real" , "real");
+        put("caracter" , "caracter");
+        put("cadena" , "cadena");
+        put("logico" , "logico");
+        put("texto" , "texto");
+        put("verdadero" , "verdadero");
+        put("falso" , "falso");
+        put("leer" , "leer");
+        put("escribir" , "escribir");
+        put("esperar" , "esperar");
+        put("si" , "si");
+        put("entonces" , "entonces");
+        put("sino" , "sino");
+        put("finsi" , "finsi");
+        put("segun" , "segun");
+        put("hacer" , "hacer");
+        put("de" , "de");
+        put("otro" , "otro");
+        put("modo" , "modo");
+        put("finsegun" , "finsegun");
+        put("mientras" , "mientras");
+        put("finmientras" , "finmientras");
+        put("repetir" , "repetir");
+        put("hasta" , "hasta");
+        put("que" , "que");
+        put("dimension" , "dimension");
+        put("para" , "para");
+        put("hasta" , "hasta");
+        put("con" , "con");
+        put("paso" , "paso");
+        put("finpara" , "finpara");
+        put("borrar" , "borrar");
+        put("limpiar" , "limpiar");
+        put("pantalla" , "pantalla");
+        put("esperar" , "esperar");
+        put("tecla" , "tecla");
+        put("segundos" , "segundos");
+        put("milisegundos" , "milisegundos");
+        //Tipos de datos
+        put("token_entero" , "token_entero");
+        put("token_real" , "token_real");
+        put("token_cadena" , "token_cadena");
+        //Operadores y símbolos
+        put("token_o", "o");
+        put("token_o", "|");
+        put("token_y", "y");
+        put("token_y", "&" );
+        put("token_neg", "no");
+        put("token_neg", "~");
+        put("token_mod", "mod");
+        put("token_mod", "%");
+        put("token_igual", "=");
+        put("token_asig", "<-");
+        put("token_dif", "<>");
+        put("token_menor", "<");
+        put("token_mayor", ">");
+        put("token_menor_igual", "<=");
+        put("token_mayor_igual", ">=");
+        put("token_mas", "+");
+        put("token_menos", "-");
+        put("token_div", "/");
+        put("token_mul", "*");
+        put("token_pyc", ";");
+        put("token_dosp", ":");
+        put("token_par_izq", "(");
+        put("token_par_der", ")");
+        put("token_cor_izq", "[");
+        put("token_cor_der", "]");
+        put("token_coma", ",");
+        put("token_pot", "^");
+        //EOF
+        put("$", "EOF");
+        //Token ID
+        put("id" , "id");
     }};
 
     public Token(String  tipo, int fila, int columna) {
@@ -153,8 +243,13 @@ class LexAn {
             result.addAll(analizeLine(line, i));
         }
         tokenList = result;
-        Token temp = tokenList.get(tokenList.size()-1);
-        tokenList.add(new Token("$",temp.fila+1,1));
+        if(tokenList.size() > 0){
+            Token temp = tokenList.get(tokenList.size()-1);
+            tokenList.add(new Token("EOF",temp.fila+1,1));
+        }else{
+            tokenList.add(new Token("EOF",0,0));
+        }
+
         return tokenList;
     }
 
@@ -492,23 +587,69 @@ class Grammar{
     //Mayuscula no terminales
     //Minuscula terminales
     private String grammar =
-            "S -> TOK_FUNCION RETURN_FUNCION BODY_FUNCION END_FUNCION\n" +
+            "S -> TOK_FUNCION RETURN_FUNCION PARAMETERS BODY_FUNCION END_FUNCION\n" +
 
-            "TOK_FUNCION -> funcion \n" +
-            "TOK_FUNCION -> subalgoritmo \n" +
-            "TOK_FUNCION -> subproceso \n" +
+                    "TOK_FUNCION -> funcion \n" +
+                    "TOK_FUNCION -> subalgoritmo \n" +
+                    "TOK_FUNCION -> subproceso \n" +
 
-            "RETURN_FUNCION -> id RETURN_FUNCION_ \n" +
-            "RETURN_FUNCION_ -> token_asig id \n" +
-            "RETURN_FUNCION_ -> e \n" +
+                    "RETURN_FUNCION -> id RETURN_FUNCION_ \n" +
+                    "RETURN_FUNCION_ -> token_asig id \n" +
+                    "RETURN_FUNCION_ -> e \n" +
 
-            "BODY_FUNCION -> entonces \n" +
+                    "PARAMETERS -> token_par_izq PARAMS token_par_der \n" +
+                    "PARAMETERS -> e \n" +
 
-            "END_FUNCION -> finfuncion \n" +
-            "END_FUNCION -> finsubalgoritmo \n" +
-            "END_FUNCION -> finsubproceso \n"
+                    "PARAMS -> id PARAMS_ \n" +
+                    "PARAMS -> e \n" +
+                    "PARAMS_ -> token_coma id PARAMS_ \n" +
+                    "PARAMS_ -> e \n" +
+
+                    "BODY_FUNCION -> COMMANDS \n" +
+
+                    "COMMANDS -> COMMAND COMMANDS \n" +
+                    "COMMANDS -> e \n" +
+
+                    "COMMAND -> SI_ESTRUCT \n" +
+
+                    "SI_ESTRUCT -> si CONDICION entonces COMMANDS SINO finsi \n" +
 
 
+                    "CONDICION -> token_neg CONDICION \n" +
+
+                    "CONDICION -> token_par_izq CONDICION token_par_der CONDICION_ \n" +
+
+                    "CONDICION -> COND_FUNC CONDICION_ \n" +
+
+                    "COND_FUNC -> id ID_FUNC \n" +
+                    "COND_FUNC -> token_entero \n" +
+                    "COND_FUNC -> token_real \n" +
+                    "COND_FUNC -> token_cadena \n" +
+                    "COND_FUNC -> verdadero \n" +
+                    "COND_FUNC -> falso \n" +
+
+                    "ID_FUNC -> token_par_izq PARAMS token_par_der \n" +
+                    "ID_FUNC -> e \n" +
+
+                    "CONDICION_ -> COMP_OPERATOR CONDICION \n" +
+                    "CONDICION_ -> e \n" +
+
+                    "COMP_OPERATOR -> token_o \n" +
+                    "COMP_OPERATOR -> token_y \n" +
+                    "COMP_OPERATOR -> token_mod \n" +
+                    "COMP_OPERATOR -> token_igual \n" +
+                    "COMP_OPERATOR -> token_dif \n" +
+                    "COMP_OPERATOR -> token_menor \n" +
+                    "COMP_OPERATOR -> token_mayor \n" +
+                    "COMP_OPERATOR -> token_menor_igual \n" +
+                    "COMP_OPERATOR -> token_mayor_igual \n" +
+
+                    "SINO -> sino COMMANDS\n" +
+                    "SINO -> e \n" +
+
+                    "END_FUNCION -> finfuncion \n" +
+                    "END_FUNCION -> finsubalgoritmo \n" +
+                    "END_FUNCION -> finsubproceso \n"
 
             ;
 
@@ -615,9 +756,9 @@ class Grammar{
     }
     public HashSet<String> Primeros(String word){
         HashSet<String> prim = new HashSet<>();
-        /*System.out.println();
+
         System.out.println("Primeros: "+word);
-         */
+
         for(String[] line : transGrammar){
             if(word.equals(line[0])){
                 /*
@@ -730,7 +871,6 @@ class SintAn {
                 errorSintaxis(tokenList.get(index).tipo);
             }
             System.out.println("El analisis sintactico ha finalizado exitosamente.");
-            System.out.println(tokenList.get(index));
 
         }
     }
@@ -748,6 +888,7 @@ class SintAn {
                 System.out.println();
                  */
                 esperados.addAll(pred[i].pred);
+                System.out.println("Tok: "+tok);
                 if(pred[i].pred.contains(tok.tipo)){
                     contains = true;
                     for(int j=2; j<grammar[i].length; j++){
@@ -791,20 +932,22 @@ class SintAn {
 
     //Error de sintaxis no coincidencia funcion
     public void errorSintaxis(Token tok, HashSet<String> esperados){
-        String newTok = tok.tipo;
-        if(tok.tipo.equals("$"))newTok = "EOF";
+        System.out.println("Error de funcion");
+        System.out.println("Recibido: "+tok);
+        System.out.println("Esperados: "+esperados);
         ArrayList<String> esperados_list = new ArrayList<>(esperados);
-        System.out.print("<"+tok.fila+","+tok.columna+"> Error sintactico: se encontro: \""+newTok+"\"; se esperaba: ");
+        System.out.print("<"+tok.fila+","+tok.columna+"> Error sintactico: se encontro: \""+tok.dicTipoRev.get(tok.tipo)+"\"; se esperaba: ");
         for(int i=0; i<esperados_list.size(); i++){
-            if(i == esperados_list.size()-1) System.out.print("\""+esperados_list.get(i)+"\".");
-            else System.out.print("\""+esperados_list.get(i)+"\", ");
+            if(i == esperados_list.size()-1) System.out.print("\""+tok.dicTipoRev.get(esperados_list.get(i))+"\".");
+            else System.out.print("\""+tok.dicTipoRev.get(esperados_list.get(i))+"\", ");
         }
         System.exit(0);
     }
 
     //Error de sintaxis no coincidencia emparejar
     public void errorSintaxis(Token tok, String token){
-        System.out.print("<"+tok.fila+","+tok.columna+"> Error sintactico: se encontro: \""+token+"\"; se esperaba: \""+tok.tipo+"\".");
+        System.out.println("Error de emparejamiento");
+        System.out.print("<"+tok.fila+","+tok.columna+"> Error sintactico: se encontro: \""+tok.dicTipoRev.get(tok.tipo)+"\"; se esperaba: \""+tok.dicTipoRev.get(token)+"\".");
         System.exit(0);
     }
 
