@@ -379,10 +379,14 @@ FinSubProceso
 "COMMAND -> DIMENSION_ESTRUCT \n" +
 "COMMAND -> SI_ESTRUCT \n" +
 "COMMAND -> CFUNC_ASIG \n" +
-
+"COMMAND -> ESCRIBIR_ESTRUCT \n" +
+"COMMAND -> LEER_ESTRUCT \n" +
+"COMMAND -> SEGUN_ESTRUCT \n" +
+"COMMAND -> MIENTRAS_ESTRUCT \n" +
+"COMMAND -> PARA_ESTRUCT \n" +
+"COMMAND -> REPETIR_ESTRUCT \n" +
 "COMMAND -> BPANTALLA_ESTRUCT \n" +
 "COMMAND -> ESPERAR_ESTRUCT \n" +
-"COMMAND -> ESCRIBIR_ESTRUCT \n" +
 
 "DEFINIR_ESTRUCT -> definir VARS como D_TYPE token_pyc \n" +
 
@@ -424,11 +428,14 @@ FinSubProceso
 
 "SI_ESTRUCT -> si CONDICION entonces COMMANDS SINO finsi \n" +
 
-"CONDICION -> token_neg CONDICION \n" +
+"CONDICION -> OPER_NEG CONDICION \n" +
 
 "CONDICION -> token_par_izq CONDICION token_par_der CONDICION_ \n" +
 
 "CONDICION -> COND_FUNC  CONDICION_ \n" +
+
+"OPER_NEG -> token_neg \n"+
+"OPER_NEG -> token_menos \n"+
 
 "COND_FUNC -> id ID_FUNC\n" +
 "COND_FUNC -> token_entero \n" +
@@ -479,7 +486,7 @@ FinSubProceso
 "VARIABLE -> SIZE \n" +
 "VARIABLE -> e \n" +
 
-"ASIG_OPER -> token_neg ASIG_OPER \n" +
+"ASIG_OPER -> OPER_NEG ASIG_OPER \n" +
 "ASIG_OPER -> token_par_izq ASIG_OPER token_par_der ASIG_OPER_ \n" +
 "ASIG_OPER -> ASIG_FUNC ASIG_OPER_\n" +
 
@@ -493,6 +500,61 @@ FinSubProceso
 "ASIG_OPER_ -> COMP_OPERATOR ASIG_OPER \n" +
 "ASIG_OPER_ -> e \n" +
 
+"LEER_ESTRUCT -> leer LEER_PARAMS token_pyc \n" +
+
+"LEER_PARAMS -> id LEER_ARRAY LEER_PARAMS_\n" +
+
+"LEER_ARRAY -> SIZE \n" +
+"LEER_ARRAY -> e \n" +
+
+"LEER_PARAMS_ -> token_coma LEER_PARAMS\n" +
+"LEER_PARAMS_ -> e \n" +
+
+"ESCRIBIR_ESTRUCT -> escribir ESCR_PARAMS token_pyc \n" +
+
+"ESCR_PARAMS -> ASIG_OPER ESCR_PARAMS_\n" +
+
+"ESCR_PARAMS_ -> token_coma ESCR_PARAMS \n" +
+"ESCR_PARAMS_ -> e \n" +
+
+"SEGUN_ESTRUCT -> segun CONDICION hacer BODY_SEGUN OTHERCASE finsegun\n" +
+
+"BODY_SEGUN -> CASE _CASE\n" +
+"BODY_SEGUN -> e\n" +
+
+"CASE -> caso CONDICION token_dosp COMMANDS \n" +
+
+"_CASE -> CASE \n" +
+"_CASE -> e \n" +
+
+"OTHERCASE -> e \n" +
+"OTHERCASE -> de otro modo token_dosp COMMANDS \n" +
+
+"MIENTRAS_ESTRUCT -> mientras CONDICION hacer COMMANDS finmientras \n" +
+
+"PARA_ESTRUCT -> para ASIG_PARA hasta ASIG_OPER_PARA CON_PASO hacer COMMANDS finpara \n" +
+
+"ASIG_PARA -> id DIM_ASIG_PARA token_asig ASIG_OPER_PARA \n" +
+
+"DIM_ASIG_PARA -> SIZE \n" +
+"DIM_ASIG_PARA -> e \n" +
+
+"ASIG_OPER_PARA -> token_menos ASIG_OPER_PARA \n" +
+"ASIG_OPER_PARA -> token_par_izq ASIG_OPER_PARA token_par_der ASIG_OPER_PARA_ \n" +
+"ASIG_OPER_PARA -> ASIG_FUNC_PARA ASIG_OPER_PARA_\n" +
+
+"ASIG_FUNC_PARA -> id ID_FUNC \n" +
+"ASIG_FUNC_PARA -> token_entero \n" +
+"ASIG_FUNC_PARA -> token_real \n" +
+
+"ASIG_OPER_PARA_ -> MATH_OPER ASIG_OPER_PARA \n" +
+"ASIG_OPER_PARA_ -> e \n" +
+
+"CON_PASO -> con paso ASIG_OPER_PARA \n" +
+"CON_PASO -> e \n" +
+
+"REPETIR_ESTRUCT -> repetir COMMANDS hasta que CONDICION \n" +
+
 "BPANTALLA_ESTRUCT -> CLEAN pantalla token_pyc \n" +
 
 "CLEAN -> borrar \n" +
@@ -504,14 +566,9 @@ FinSubProceso
 "ESPERAR_OPCION -> token_entero TIME_OPTION \n" +
 
 "TIME_OPTION -> segundos \n" +
-"TIME_OPTION -> milisegundos \n" +
+"TIME_OPTION -> milisegundos \n"
 
-"ESCRIBIR_ESTRUCT -> escribir ESCR_PARAMS token_pyc \n" +
 
-"ESCR_PARAMS -> ASIG_OPER ESCR_PARAMS_\n" +
-
-"ESCR_PARAMS_ -> token_coma ESCR_PARAMS \n" +
-"ESCR_PARAMS_ -> e \n" 
 
 
 
@@ -595,5 +652,56 @@ proceso mi_proceso
     finsi
     test(a[0],as,s);
     x[0] <- z[0];
-    
+    leer x[0], x, z, z[1,2], asd[1]; 
+    si -(5)*3=15 entonces
+    finsi
+    x <- 4;
+    x(-1);
+    x <- -5;
+    segun -(x*z) hacer
+        caso 1:
+        segun -(x*z) hacer
+            de otro modo:
+                escribir "No se";
+                
+        finsegun
+    finsegun
+    segun 5 hacer
+        de otro modo:
+            escribir "No se";
+    finsegun
+
+    mientras ~~~~~~~~~(verdadero) + (5*4 = 4) hacer
+        escribir "Siuuuu";
+    finmientras
+
+    para arreglo <- 5 hasta
+    finpara
 finproceso
+
+proceso mi_proceso
+    segun -(x*z) hacer
+        caso 1:
+        segun -(x*z) hacer
+            de otro modo:
+                escribir "No se";
+                
+        finsegun
+    finsegun
+    segun 5 hacer
+        de otro modo:
+            escribir "No se";
+    finsegun
+finproceso
+
+proceso mi_proceso
+    para arreglo[0,0,0,0,0,1] <- -(5*8/3-4) hasta 10 con paso 2 hacer
+        escribir "Funciona el para";
+    finpara
+
+    repetir
+        escribir "Funciona el para";
+    hasta (verdadero)
+finproceso
+
+"Tests traductor"
