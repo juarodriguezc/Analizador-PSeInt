@@ -158,13 +158,11 @@ class Token {
         put("segundos" , "segundos");
         put("milisegundos" , "milisegundos");
         //Tipos de datos
-        put("token_entero" , "token_entero");
-        put("token_real" , "token_real");
-        put("token_cadena" , "token_cadena");
+        put("token_entero" , "valor_entero");
+        put("token_real" , "valor_real");
+        put("token_cadena" , "valor_cadena");
         //Operadores y símbolos
-        put("token_o", "o");
         put("token_o", "|");
-        put("token_y", "y");
         put("token_y", "&" );
         put("token_neg", "no");
         put("token_neg", "~");
@@ -192,7 +190,7 @@ class Token {
         //EOF
         put("$", "EOF");
         //Token ID
-        put("id" , "id");
+        put("id" , "identificador");
     }};
 
     public Token(String  tipo, int fila, int columna) {
@@ -587,7 +585,14 @@ class Grammar{
     //Mayuscula no terminales
     //Minuscula terminales
     private String grammar =
-            "S -> TOK_FUNCION RETURN_FUNCION PARAMETERS BODY_FUNCION END_FUNCION\n" +
+
+            "S -> FUN_SALGPRO MAIN FUN_SALGPRO \n" +
+
+                    "FUN_SALGPRO -> FUN_SALGPRO_ESTRUCT FUN_SALGPRO \n" +
+
+                    "FUN_SALGPRO -> e \n" +
+
+                    "FUN_SALGPRO_ESTRUCT -> TOK_FUNCION RETURN_FUNCION PARAMETERS COMMANDS END_FUNCION \n" +
 
                     "TOK_FUNCION -> funcion \n" +
                     "TOK_FUNCION -> subalgoritmo \n" +
@@ -605,31 +610,91 @@ class Grammar{
                     "PARAMS_ -> token_coma id PARAMS_ \n" +
                     "PARAMS_ -> e \n" +
 
-                    "BODY_FUNCION -> COMMANDS \n" +
+                    "END_FUNCION -> finfuncion \n" +
+                    "END_FUNCION -> finsubalgoritmo \n" +
+                    "END_FUNCION -> finsubproceso \n" +
+
+                    "MAIN -> TOK_MAIN id COMMANDS END_MAIN \n" +
+
+                    "TOK_MAIN -> proceso \n" +
+                    "TOK_MAIN -> algoritmo \n" +
+
+                    "END_MAIN -> finproceso \n" +
+                    "END_MAIN -> finalgoritmo \n" +
 
                     "COMMANDS -> COMMAND COMMANDS \n" +
                     "COMMANDS -> e \n" +
 
+                    "COMMAND -> DEFINIR_ESTRUCT \n" +
+                    "COMMAND -> DIMENSION_ESTRUCT \n" +
                     "COMMAND -> SI_ESTRUCT \n" +
+                    "COMMAND -> CFUNC_ASIG \n" +
+
+                    "COMMAND -> BPANTALLA_ESTRUCT \n" +
+                    "COMMAND -> ESPERAR_ESTRUCT \n" +
+                    "COMMAND -> ESCRIBIR_ESTRUCT \n" +
+
+                    "DEFINIR_ESTRUCT -> definir VARS como D_TYPE token_pyc \n" +
+
+                    "VARS -> id VARS_ \n" +
+
+                    "VARS_ -> token_coma id VARS_ \n" +
+                    "VARS_ -> e \n" +
+
+                    "D_TYPE -> numerico \n" +
+                    "D_TYPE -> numero \n" +
+                    "D_TYPE -> entero \n" +
+                    "D_TYPE -> real \n" +
+                    "D_TYPE -> caracter \n" +
+                    "D_TYPE -> cadena \n" +
+                    "D_TYPE -> logico \n" +
+                    "D_TYPE -> texto \n" +
+
+                    "DIMENSION_ESTRUCT -> dimension id SIZE token_pyc \n" +
+
+                    "SIZE -> token_cor_izq SIZES token_cor_der \n" +
+
+                    "SIZES -> MATH_RESULT_ENTERO SIZES_ \n" +
+
+                    "MATH_RESULT_ENTERO -> token_par_izq MATH_RESULT_ENTERO token_par_der MATH_RESULT_ENTERO_ \n" +
+                    "MATH_RESULT_ENTERO -> token_entero  MATH_RESULT_ENTERO_\n" +
+
+                    "MATH_RESULT_ENTERO_ -> MATH_OPER  MATH_RESULT_ENTERO\n" +
+                    "MATH_RESULT_ENTERO_ -> e \n" +
+
+                    "MATH_OPER -> token_mas \n" +
+                    "MATH_OPER -> token_menos \n" +
+                    "MATH_OPER -> token_mul \n" +
+                    "MATH_OPER -> token_div \n" +
+                    "MATH_OPER -> token_mod \n" +
+                    "MATH_OPER -> token_pot \n" +
+
+                    "SIZES_ -> token_coma SIZES \n" +
+                    "SIZES_ -> e \n" +
 
                     "SI_ESTRUCT -> si CONDICION entonces COMMANDS SINO finsi \n" +
-
 
                     "CONDICION -> token_neg CONDICION \n" +
 
                     "CONDICION -> token_par_izq CONDICION token_par_der CONDICION_ \n" +
 
-                    "CONDICION -> COND_FUNC CONDICION_ \n" +
+                    "CONDICION -> COND_FUNC  CONDICION_ \n" +
 
-                    "COND_FUNC -> id ID_FUNC \n" +
+                    "COND_FUNC -> id ID_FUNC\n" +
                     "COND_FUNC -> token_entero \n" +
                     "COND_FUNC -> token_real \n" +
                     "COND_FUNC -> token_cadena \n" +
                     "COND_FUNC -> verdadero \n" +
                     "COND_FUNC -> falso \n" +
 
-                    "ID_FUNC -> token_par_izq PARAMS token_par_der \n" +
+                    "ID_FUNC -> token_par_izq PARAMS_FUNCTION token_par_der \n" +
+                    "ID_FUNC -> SIZE \n" +
                     "ID_FUNC -> e \n" +
+
+                    "PARAMS_FUNCTION -> CONDICION PARAMS_FUNCTION_ \n" +
+                    "PARAMS_FUNCTION -> e \n" +
+                    "PARAMS_FUNCTION_ -> token_coma CONDICION PARAMS_FUNCTION_ \n" +
+                    "PARAMS_FUNCTION_ -> e \n" +
 
                     "CONDICION_ -> COMP_OPERATOR CONDICION \n" +
                     "CONDICION_ -> e \n" +
@@ -643,13 +708,62 @@ class Grammar{
                     "COMP_OPERATOR -> token_mayor \n" +
                     "COMP_OPERATOR -> token_menor_igual \n" +
                     "COMP_OPERATOR -> token_mayor_igual \n" +
+                    "COMP_OPERATOR -> token_mas \n" +
+                    "COMP_OPERATOR -> token_menos \n" +
+                    "COMP_OPERATOR -> token_div \n" +
+                    "COMP_OPERATOR -> token_mul \n" +
+                    "COMP_OPERATOR -> token_pot \n" +
 
                     "SINO -> sino COMMANDS\n" +
                     "SINO -> e \n" +
 
-                    "END_FUNCION -> finfuncion \n" +
-                    "END_FUNCION -> finsubalgoritmo \n" +
-                    "END_FUNCION -> finsubproceso \n"
+
+                    "CFUNC_ASIG -> id CFUNC_ASIG_ \n" +
+
+                    "CFUNC_ASIG_ -> CALL_FUNCTION_ESTRUCT \n" +
+                    "CFUNC_ASIG_ -> ASIGNACION_ESTRUCT \n" +
+
+                    "CALL_FUNCTION_ESTRUCT -> token_par_izq PARAMS_FUNCTION token_par_der token_pyc \n" +
+
+                    "ASIGNACION_ESTRUCT -> VARIABLE token_asig ASIG_OPER token_pyc\n" +
+
+                    "VARIABLE -> SIZE \n" +
+                    "VARIABLE -> e \n" +
+
+                    "ASIG_OPER -> token_neg ASIG_OPER \n" +
+                    "ASIG_OPER -> token_par_izq ASIG_OPER token_par_der ASIG_OPER_ \n" +
+                    "ASIG_OPER -> ASIG_FUNC ASIG_OPER_\n" +
+
+                    "ASIG_FUNC -> id ID_FUNC \n" +
+                    "ASIG_FUNC -> token_entero \n" +
+                    "ASIG_FUNC -> token_real \n" +
+                    "ASIG_FUNC -> token_cadena \n" +
+                    "ASIG_FUNC -> verdadero \n" +
+                    "ASIG_FUNC -> falso \n" +
+
+                    "ASIG_OPER_ -> COMP_OPERATOR ASIG_OPER \n" +
+                    "ASIG_OPER_ -> e \n" +
+
+                    "BPANTALLA_ESTRUCT -> CLEAN pantalla token_pyc \n" +
+
+                    "CLEAN -> borrar \n" +
+                    "CLEAN -> limpiar \n"+
+
+                    "ESPERAR_ESTRUCT -> esperar ESPERAR_OPCION token_pyc\n" +
+
+                    "ESPERAR_OPCION -> tecla \n" +
+                    "ESPERAR_OPCION -> token_entero TIME_OPTION \n" +
+
+                    "TIME_OPTION -> segundos \n" +
+                    "TIME_OPTION -> milisegundos \n" +
+
+                    "ESCRIBIR_ESTRUCT -> escribir ESCR_PARAMS token_pyc \n" +
+
+                    "ESCR_PARAMS -> ASIG_OPER ESCR_PARAMS_\n" +
+
+                    "ESCR_PARAMS_ -> token_coma ESCR_PARAMS \n" +
+                    "ESCR_PARAMS_ -> e \n"
+
 
             ;
 
@@ -936,10 +1050,14 @@ class SintAn {
         System.out.println("Recibido: "+tok);
         System.out.println("Esperados: "+esperados);
         ArrayList<String> esperados_list = new ArrayList<>(esperados);
-        System.out.print("<"+tok.fila+","+tok.columna+"> Error sintactico: se encontro: \""+tok.dicTipoRev.get(tok.tipo)+"\"; se esperaba: ");
-        for(int i=0; i<esperados_list.size(); i++){
-            if(i == esperados_list.size()-1) System.out.print("\""+tok.dicTipoRev.get(esperados_list.get(i))+"\".");
-            else System.out.print("\""+tok.dicTipoRev.get(esperados_list.get(i))+"\", ");
+        if(esperados.contains("proceso") || esperados.contains("algoritmo")){
+            System.out.print("Error sintactico: falta proceso");
+        }else{
+            System.out.print("<"+tok.fila+","+tok.columna+"> Error sintactico: se encontro: \""+tok.dicTipoRev.get(tok.tipo)+"\"; se esperaba: ");
+            for(int i=0; i<esperados_list.size(); i++){
+                if(i == esperados_list.size()-1) System.out.print("\""+tok.dicTipoRev.get(esperados_list.get(i))+"\".");
+                else System.out.print("\""+tok.dicTipoRev.get(esperados_list.get(i))+"\", ");
+            }
         }
         System.exit(0);
     }
