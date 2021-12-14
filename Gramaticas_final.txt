@@ -404,16 +404,31 @@ FinSubProceso
 "D_TYPE -> logico \n" +
 "D_TYPE -> texto \n" +
 
-"DIMENSION_ESTRUCT -> dimension id SIZE token_pyc \n" +
+"DIMENSION_ESTRUCT -> dimension ARRAYS token_pyc \n" +
+
+"ARRAYS -> ARRAY ARRAY_ \n" +
+
+"ARRAY -> id SIZE \n" +
+
+"ARRAY_ -> token_coma ARRAYS \n" +
+"ARRAY_ -> e \n" +
 
 "SIZE -> token_cor_izq SIZES token_cor_der \n" +
 
 "SIZES -> MATH_RESULT_ENTERO SIZES_ \n" +
 
+"MATH_RESULT_ENTERO -> SIZE MATH_RESULT_ENTERO_ \n" +
 "MATH_RESULT_ENTERO -> token_par_izq MATH_RESULT_ENTERO token_par_der MATH_RESULT_ENTERO_ \n" +
-"MATH_RESULT_ENTERO -> token_entero  MATH_RESULT_ENTERO_\n" +
+"MATH_RESULT_ENTERO -> token_entero MATH_RESULT_ENTERO_\n" +
 
-"MATH_RESULT_ENTERO_ -> MATH_OPER  MATH_RESULT_ENTERO\n" +
+
+"MATH_RESULT_ENTERO -> id MATH_ID_OPER\n" +
+
+"MATH_ID_OPER -> token_par_izq PARAMS_FUNCTION token_par_der MATH_RESULT_ENTERO_\n" +
+
+
+
+"MATH_RESULT_ENTERO_ -> MATH_OPER MATH_RESULT_ENTERO\n" +
 "MATH_RESULT_ENTERO_ -> e \n" +
 
 "MATH_OPER -> token_mas \n" +
@@ -524,7 +539,7 @@ FinSubProceso
 
 "CASE -> caso CONDICION token_dosp COMMANDS \n" +
 
-"_CASE -> CASE \n" +
+"_CASE -> BODY_SEGUN \n" +
 "_CASE -> e \n" +
 
 "OTHERCASE -> e \n" +
@@ -569,10 +584,279 @@ FinSubProceso
 "TIME_OPTION -> milisegundos \n"
 
 
+"
 
+---------------------------------------------------------------------------------------------------------
+"  v5      gramática
+
+"S -> FUN_SALGPRO MAIN FUN_SALGPRO \n" +
+
+"FUN_SALGPRO -> FUN_SALGPRO_ESTRUCT FUN_SALGPRO \n" +
+
+"FUN_SALGPRO -> e \n" +
+
+"FUN_SALGPRO_ESTRUCT -> TOK_FUNCION RETURN_FUNCION PARAMETERS COMMANDS END_FUNCION \n" +
+
+"TOK_FUNCION -> funcion \n" +
+"TOK_FUNCION -> subalgoritmo \n" +
+"TOK_FUNCION -> subproceso \n" +
+
+"RETURN_FUNCION -> id RETURN_FUNCION_ \n" +
+"RETURN_FUNCION_ -> token_asig id \n" +
+"RETURN_FUNCION_ -> e \n" +
+
+"PARAMETERS -> token_par_izq PARAMS token_par_der \n" +
+"PARAMETERS -> e \n" +
+
+"PARAMS -> id PARAMS_ \n" +
+"PARAMS -> e \n" +
+"PARAMS_ -> token_coma id PARAMS_ \n" +
+"PARAMS_ -> e \n" +
+
+"END_FUNCION -> finfuncion \n" +
+"END_FUNCION -> finsubalgoritmo \n" +
+"END_FUNCION -> finsubproceso \n" +
+
+"MAIN -> TOK_MAIN id COMMANDS END_MAIN \n" +
+
+"TOK_MAIN -> proceso \n" +
+"TOK_MAIN -> algoritmo \n" +
+
+"END_MAIN -> finproceso \n" +
+"END_MAIN -> finalgoritmo \n" +
+
+"COMMANDS -> COMMAND COMMANDS \n" +
+"COMMANDS -> e \n" +
+
+"COMMAND -> DEFINIR_ESTRUCT \n" +
+"COMMAND -> DIMENSION_ESTRUCT \n" +
+"COMMAND -> SI_ESTRUCT \n" +
+"COMMAND -> CFUNC_ASIG \n" +
+"COMMAND -> ESCRIBIR_ESTRUCT \n" +
+"COMMAND -> LEER_ESTRUCT \n" +
+"COMMAND -> SEGUN_ESTRUCT \n" +
+"COMMAND -> MIENTRAS_ESTRUCT \n" +
+"COMMAND -> PARA_ESTRUCT \n" +
+"COMMAND -> REPETIR_ESTRUCT \n" +
+"COMMAND -> BPANTALLA_ESTRUCT \n" +
+"COMMAND -> ESPERAR_ESTRUCT \n" +
+
+"DEFINIR_ESTRUCT -> definir VARS como D_TYPE token_pyc \n" +
+
+"VARS -> id VARS_ \n" +
+
+"VARS_ -> token_coma id VARS_ \n" +
+"VARS_ -> e \n" +
+
+"D_TYPE -> numerico \n" +
+"D_TYPE -> numero \n" +
+"D_TYPE -> entero \n" +
+"D_TYPE -> real \n" +
+"D_TYPE -> caracter \n" +
+"D_TYPE -> cadena \n" +
+"D_TYPE -> logico \n" +
+"D_TYPE -> texto \n" +
+
+"DIMENSION_ESTRUCT -> dimension ARRAYS token_pyc \n" +
+
+"ARRAYS -> ARRAY ARRAY_ \n" +
+
+"ARRAY -> id SIZE \n" +
+
+"ARRAY_ -> token_coma ARRAYS \n" +
+"ARRAY_ -> e \n" +
+
+"SIZE -> token_cor_izq SIZES token_cor_der \n" +
+
+"SIZES -> MATH_RESULT_ENTERO SIZES_ \n" +
+
+"SIZES_ -> token_coma SIZES \n" +
+"SIZES_ -> e \n" +
+
+"MATH_RESULT_ENTERO -> token_par_izq MATH_RESULT_ENTERO token_par_der MATH_RESULT_ENTERO_ \n" +
+"MATH_RESULT_ENTERO -> token_menos MATH_RESULT_ENTERO MATH_RESULT_ENTERO_\n" +
+"MATH_RESULT_ENTERO -> token_entero MATH_RESULT_ENTERO_\n" +
+"MATH_RESULT_ENTERO -> id MATH_RESULT_ENTERO_\n" +
+
+"MATH_RESULT_ENTERO_ -> MATH_OPER MATH_RESULT_ENTERO\n" +
+"MATH_RESULT_ENTERO_ -> e \n" +
+
+"MATH_OPER -> token_mas \n" +
+"MATH_OPER -> token_menos \n" +
+"MATH_OPER -> token_mul \n" +
+"MATH_OPER -> token_div \n" +
+"MATH_OPER -> token_mod \n" +
+"MATH_OPER -> token_pot \n" +
+
+"SI_ESTRUCT -> si CONDICION entonces COMMANDS SINO finsi \n" +
+
+"CONDICION -> OPER_NEG CONDICION \n" +
+
+"CONDICION -> token_par_izq CONDICION token_par_der CONDICION_ \n" +
+
+"CONDICION -> COND_FUNC  CONDICION_ \n" +
+
+"OPER_NEG -> token_neg \n"+
+"OPER_NEG -> token_menos \n"+
+
+"COND_FUNC -> id ID_FUNC\n" +
+"COND_FUNC -> token_entero \n" +
+"COND_FUNC -> token_real \n" +
+"COND_FUNC -> token_cadena \n" +
+"COND_FUNC -> verdadero \n" +
+"COND_FUNC -> falso \n" +
+
+"ID_FUNC -> token_par_izq PARAMS_FUNCTION token_par_der \n" +
+"ID_FUNC -> A_ARRAY_SIZE \n" +
+"ID_FUNC -> e \n" +
+
+"PARAMS_FUNCTION -> CONDICION PARAMS_FUNCTION_ \n" +
+"PARAMS_FUNCTION -> e \n" +
+"PARAMS_FUNCTION_ -> token_coma CONDICION PARAMS_FUNCTION_ \n" +
+"PARAMS_FUNCTION_ -> e \n" +
+
+"CONDICION_ -> COMP_OPERATOR CONDICION \n" +
+"CONDICION_ -> e \n" +
+
+"COMP_OPERATOR -> token_o \n" +
+"COMP_OPERATOR -> token_y \n" +
+"COMP_OPERATOR -> token_mod \n" +
+"COMP_OPERATOR -> token_igual \n" +
+"COMP_OPERATOR -> token_dif \n" +
+"COMP_OPERATOR -> token_menor \n" +
+"COMP_OPERATOR -> token_mayor \n" +
+"COMP_OPERATOR -> token_menor_igual \n" +
+"COMP_OPERATOR -> token_mayor_igual \n" +
+"COMP_OPERATOR -> token_mas \n" +
+"COMP_OPERATOR -> token_menos \n" +
+"COMP_OPERATOR -> token_div \n" +
+"COMP_OPERATOR -> token_mul \n" +
+"COMP_OPERATOR -> token_pot \n" +
+
+"SINO -> sino COMMANDS\n" +
+"SINO -> e \n" +
+
+"CFUNC_ASIG -> id CFUNC_ASIG_ \n" +
+
+"CFUNC_ASIG_ -> CALL_FUNCTION_ESTRUCT \n" +
+"CFUNC_ASIG_ -> ASIGNACION_ESTRUCT \n" +
+"CFUNC_ASIG_ -> CALL_VAR \n" +
+
+"CALL_FUNCTION_ESTRUCT -> token_par_izq PARAMS_FUNCTION token_par_der token_pyc \n" +
+
+"ASIGNACION_ESTRUCT -> VARIABLE token_asig ASIG_OPER token_pyc\n" +
+
+"CALL_VAR -> token_pyc \n" +
+
+"VARIABLE -> A_ARRAY_SIZE \n" +
+"VARIABLE -> e \n" +
+
+"A_ARRAY_SIZE -> token_cor_izq A_ARRAY_SIZES token_cor_der \n" +
+
+"A_ARRAY_SIZES -> A_MATH_RESULT_ENTERO A_ARRAY_SIZES_ \n" +
+
+"A_MATH_RESULT_ENTERO -> token_menos A_MATH_RESULT_ENTERO A_MATH_RESULT_ENTERO_ \n" +
+"A_MATH_RESULT_ENTERO -> token_par_izq A_MATH_RESULT_ENTERO token_par_der A_MATH_RESULT_ENTERO_ \n" +
+"A_MATH_RESULT_ENTERO -> token_entero A_MATH_RESULT_ENTERO_\n" +
+
+"A_MATH_RESULT_ENTERO -> id A_MATH_ID_OP_ARR MATH_RESULT_ENTERO_\n" +
+
+"A_MATH_ID_OP_ARR -> e \n" +
+"A_MATH_ID_OP_ARR -> token_par_izq PARAMS_FUNCTION token_par_der \n" +
+"A_MATH_ID_OP_ARR -> token_cor_izq A_ARRAY_SIZES token_cor_der \n" +
+
+"A_MATH_RESULT_ENTERO_ -> MATH_OPER A_MATH_RESULT_ENTERO\n" +
+"A_MATH_RESULT_ENTERO_ -> e \n" +
+
+"A_ARRAY_SIZES_ -> token_coma A_ARRAY_SIZES \n" +
+"A_ARRAY_SIZES_ -> e \n" +
+
+"ASIG_OPER -> OPER_NEG ASIG_OPER \n" +
+"ASIG_OPER -> token_par_izq ASIG_OPER token_par_der ASIG_OPER_ \n" +
+"ASIG_OPER -> ASIG_FUNC ASIG_OPER_\n" +
+
+"ASIG_FUNC -> id ID_FUNC \n" +
+"ASIG_FUNC -> token_entero \n" +
+"ASIG_FUNC -> token_real \n" +
+"ASIG_FUNC -> token_cadena \n" +
+"ASIG_FUNC -> verdadero \n" +
+"ASIG_FUNC -> falso \n" +
+
+"ASIG_OPER_ -> COMP_OPERATOR ASIG_OPER \n" +
+"ASIG_OPER_ -> e \n" +
+
+"LEER_ESTRUCT -> leer LEER_PARAMS token_pyc \n" +
+
+"LEER_PARAMS -> id LEER_ARRAY LEER_PARAMS_\n" +
+
+"LEER_ARRAY -> SIZE \n" +
+"LEER_ARRAY -> e \n" +
+
+"LEER_PARAMS_ -> token_coma LEER_PARAMS\n" +
+"LEER_PARAMS_ -> e \n" +
+
+"ESCRIBIR_ESTRUCT -> escribir ESCR_PARAMS token_pyc \n" +
+
+"ESCR_PARAMS -> ASIG_OPER ESCR_PARAMS_\n" +
+
+"ESCR_PARAMS_ -> token_coma ESCR_PARAMS \n" +
+"ESCR_PARAMS_ -> e \n" +
+
+"SEGUN_ESTRUCT -> segun CONDICION hacer BODY_SEGUN OTHERCASE finsegun\n" +
+
+"BODY_SEGUN -> CASE _CASE\n" +
+"BODY_SEGUN -> e\n" +
+
+"CASE -> caso CONDICION token_dosp COMMANDS \n" +
+
+"_CASE -> BODY_SEGUN \n" +
+"_CASE -> e \n" +
+
+"OTHERCASE -> e \n" +
+"OTHERCASE -> de otro modo token_dosp COMMANDS \n" +
+
+"MIENTRAS_ESTRUCT -> mientras CONDICION hacer COMMANDS finmientras \n" +
+
+"PARA_ESTRUCT -> para ASIG_PARA hasta ASIG_OPER_PARA CON_PASO hacer COMMANDS finpara \n" +
+
+"ASIG_PARA -> id DIM_ASIG_PARA token_asig ASIG_OPER_PARA \n" +
+
+"DIM_ASIG_PARA -> SIZE \n" +
+"DIM_ASIG_PARA -> e \n" +
+
+"ASIG_OPER_PARA -> token_menos ASIG_OPER_PARA \n" +
+"ASIG_OPER_PARA -> token_par_izq ASIG_OPER_PARA token_par_der ASIG_OPER_PARA_ \n" +
+"ASIG_OPER_PARA -> ASIG_FUNC_PARA ASIG_OPER_PARA_\n" +
+
+"ASIG_FUNC_PARA -> id ID_FUNC \n" +
+"ASIG_FUNC_PARA -> token_entero \n" +
+"ASIG_FUNC_PARA -> token_real \n" +
+
+"ASIG_OPER_PARA_ -> MATH_OPER ASIG_OPER_PARA \n" +
+"ASIG_OPER_PARA_ -> e \n" +
+
+"CON_PASO -> con paso ASIG_OPER_PARA \n" +
+"CON_PASO -> e \n" +
+
+"REPETIR_ESTRUCT -> repetir COMMANDS hasta que CONDICION \n" +
+
+"BPANTALLA_ESTRUCT -> CLEAN pantalla token_pyc \n" +
+
+"CLEAN -> borrar \n" +
+"CLEAN -> limpiar \n"+
+
+"ESPERAR_ESTRUCT -> esperar ESPERAR_OPCION token_pyc\n" +
+
+"ESPERAR_OPCION -> tecla \n" +
+"ESPERAR_OPCION -> token_entero TIME_OPTION \n" +
+
+"TIME_OPTION -> segundos \n" +
+"TIME_OPTION -> milisegundos \n"
 
 
 "
+
+
 
 "Ejemplo de prueba"
 SubProceso ans <- axis (var1, var2, var3)
@@ -682,16 +966,13 @@ finproceso
 proceso mi_proceso
     segun -(x*z) hacer
         caso 1:
-        segun -(x*z) hacer
-            de otro modo:
-                escribir "No se";
-                
-        finsegun
-    finsegun
-    segun 5 hacer
-        de otro modo:
+            escribir "No se";
+        caso 1:
+            escribir "No se";
+        caso 1:
             escribir "No se";
     finsegun
+    id[id[id[0],id[0]]] <- id[id[id[0],id[0]]];
 finproceso
 
 proceso mi_proceso
@@ -705,3 +986,67 @@ proceso mi_proceso
 finproceso
 
 "Tests traductor"
+
+//Test 01 - Aprobado
+Proceso mi_proceso
+    Definir datos Como Numero;
+    Dimension datos[200]
+finalgoritmo
+
+//Test 02 - Casi aprobado
+Proceso mi_proceso
+    definir a como entero;
+    a <- no verdadero;
+finalgoritmo
+
+//Test 03 - Aprobado
+Proceso mi_proceso
+    Escribir 3+1*7;
+finalgoritmo
+
+//Test 04 - Casi aprobado
+Proceso mi_proceso
+    Definir a como entero;
+    Escribir a1/10;
+
+//Test 05 - Aprobado
+Funcion s<-potencia (a,b)
+    Definir s Como Real;
+    s <- a^b;
+FinFuncion
+Proceso potenciador
+    //Comentario
+    Escribir potencia(1,2);
+finproceso
+
+//Test 06 - Aprobado
+Proceso proceso2
+    Si a<b Entonces
+        Escribir "a es mayor";
+    Sino
+        Escribir "b es mayor";
+    FinSi
+
+    Si a<b 
+        Escribir "a es mayor";
+    Sino
+        Escribir "b es mayor";
+    FinSi
+FinProceso
+
+//Test 07 - Aprobado
+Proceso proceso2
+    Mientras Verdadero Hacer
+        Escribir "Analizador";
+    FinMientras
+
+    Mientras a>b 
+        Escribir "Analizador";
+    FinMientras
+FinProceso
+
+//Test 08
+SubProceso f <- triple ( x )
+    Definir f Como numero;
+    f <- x*3;
+FinSubProceso

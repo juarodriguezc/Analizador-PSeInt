@@ -1,0 +1,27 @@
+proceso mi_proceso
+   
+   Escribir "Te adivinare un numero";
+   Escribir "Piensa un numero del 1 al 100";
+   
+   definir low,mid,hi como entero;
+   definir adivine como logico;
+   
+   low <- 1;
+   hi <- 100; 
+  
+   mientras  low<hi hacer
+       
+       mid <- (low + hi)/2;
+       
+       Escribir "El numero es ", mid, "?";
+       Leer adivine;
+       
+       si adivine entonces
+           escribir "Si ves ;)";   
+           low <- hi+1; //Salir del ciclo
+       sino
+           low = mid+1; //Incorrecto BS pero para analisis sintactico sirve
+       finsi
+       
+   finmientras
+finproceso

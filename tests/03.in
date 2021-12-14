@@ -1,0 +1,8 @@
+//Prueba el LLAMADO de funciones
+proceso mi_proceso
+    Definir a como real;
+    a <- funcion_random(3,a,20*1);
+    a <- raiz_cuadrada(20);
+    a <- a[funcion_random(3,a,20*1), raiz_cuadrada(20)]; //Sintacticamente correcto
+    b <- a*a[0]*a[0,0]*a(0,0);
+finproceso

@@ -454,7 +454,7 @@ class LexAn {
                     break;
                 case q6:
                     if(input == '/'){
-                        return new ArrayList<>();
+                        return result;
                     }else{
                         //Estado de aceptación DIVISION
                         {
@@ -587,7 +587,6 @@ class Grammar{
     //Mayuscula no terminales
     //Minuscula terminales
     private String grammar =
-
             "S -> FUN_SALGPRO MAIN FUN_SALGPRO \n" +
 
             "FUN_SALGPRO -> FUN_SALGPRO_ESTRUCT FUN_SALGPRO \n" +
@@ -656,16 +655,28 @@ class Grammar{
             "D_TYPE -> logico \n" +
             "D_TYPE -> texto \n" +
 
-            "DIMENSION_ESTRUCT -> dimension id SIZE token_pyc \n" +
+            "DIMENSION_ESTRUCT -> dimension ARRAYS token_pyc \n" +
+
+            "ARRAYS -> ARRAY ARRAY_ \n" +
+
+            "ARRAY -> id SIZE \n" +
+
+            "ARRAY_ -> token_coma ARRAYS \n" +
+            "ARRAY_ -> e \n" +
 
             "SIZE -> token_cor_izq SIZES token_cor_der \n" +
 
             "SIZES -> MATH_RESULT_ENTERO SIZES_ \n" +
 
-            "MATH_RESULT_ENTERO -> token_par_izq MATH_RESULT_ENTERO token_par_der MATH_RESULT_ENTERO_ \n" +
-            "MATH_RESULT_ENTERO -> token_entero  MATH_RESULT_ENTERO_\n" +
+            "SIZES_ -> token_coma SIZES \n" +
+            "SIZES_ -> e \n" +
 
-            "MATH_RESULT_ENTERO_ -> MATH_OPER  MATH_RESULT_ENTERO\n" +
+            "MATH_RESULT_ENTERO -> token_par_izq MATH_RESULT_ENTERO token_par_der MATH_RESULT_ENTERO_ \n" +
+            "MATH_RESULT_ENTERO -> token_menos MATH_RESULT_ENTERO MATH_RESULT_ENTERO_\n" +
+            "MATH_RESULT_ENTERO -> token_entero MATH_RESULT_ENTERO_\n" +
+            "MATH_RESULT_ENTERO -> id MATH_RESULT_ENTERO_\n" +
+
+            "MATH_RESULT_ENTERO_ -> MATH_OPER MATH_RESULT_ENTERO\n" +
             "MATH_RESULT_ENTERO_ -> e \n" +
 
             "MATH_OPER -> token_mas \n" +
@@ -674,9 +685,6 @@ class Grammar{
             "MATH_OPER -> token_div \n" +
             "MATH_OPER -> token_mod \n" +
             "MATH_OPER -> token_pot \n" +
-
-            "SIZES_ -> token_coma SIZES \n" +
-            "SIZES_ -> e \n" +
 
             "SI_ESTRUCT -> si CONDICION entonces COMMANDS SINO finsi \n" +
 
@@ -697,7 +705,7 @@ class Grammar{
             "COND_FUNC -> falso \n" +
 
             "ID_FUNC -> token_par_izq PARAMS_FUNCTION token_par_der \n" +
-            "ID_FUNC -> SIZE \n" +
+            "ID_FUNC -> A_ARRAY_SIZE \n" +
             "ID_FUNC -> e \n" +
 
             "PARAMS_FUNCTION -> CONDICION PARAMS_FUNCTION_ \n" +
@@ -730,13 +738,36 @@ class Grammar{
 
             "CFUNC_ASIG_ -> CALL_FUNCTION_ESTRUCT \n" +
             "CFUNC_ASIG_ -> ASIGNACION_ESTRUCT \n" +
+            "CFUNC_ASIG_ -> CALL_VAR \n" +
 
             "CALL_FUNCTION_ESTRUCT -> token_par_izq PARAMS_FUNCTION token_par_der token_pyc \n" +
 
             "ASIGNACION_ESTRUCT -> VARIABLE token_asig ASIG_OPER token_pyc\n" +
 
-            "VARIABLE -> SIZE \n" +
+            "CALL_VAR -> token_pyc \n" +
+
+            "VARIABLE -> A_ARRAY_SIZE \n" +
             "VARIABLE -> e \n" +
+
+            "A_ARRAY_SIZE -> token_cor_izq A_ARRAY_SIZES token_cor_der \n" +
+
+            "A_ARRAY_SIZES -> A_MATH_RESULT_ENTERO A_ARRAY_SIZES_ \n" +
+
+            "A_MATH_RESULT_ENTERO -> token_menos A_MATH_RESULT_ENTERO A_MATH_RESULT_ENTERO_ \n" +
+            "A_MATH_RESULT_ENTERO -> token_par_izq A_MATH_RESULT_ENTERO token_par_der A_MATH_RESULT_ENTERO_ \n" +
+            "A_MATH_RESULT_ENTERO -> token_entero A_MATH_RESULT_ENTERO_\n" +
+
+            "A_MATH_RESULT_ENTERO -> id A_MATH_ID_OP_ARR MATH_RESULT_ENTERO_\n" +
+
+            "A_MATH_ID_OP_ARR -> e \n" +
+            "A_MATH_ID_OP_ARR -> token_par_izq PARAMS_FUNCTION token_par_der \n" +
+            "A_MATH_ID_OP_ARR -> token_cor_izq A_ARRAY_SIZES token_cor_der \n" +
+
+            "A_MATH_RESULT_ENTERO_ -> MATH_OPER A_MATH_RESULT_ENTERO\n" +
+            "A_MATH_RESULT_ENTERO_ -> e \n" +
+
+            "A_ARRAY_SIZES_ -> token_coma A_ARRAY_SIZES \n" +
+            "A_ARRAY_SIZES_ -> e \n" +
 
             "ASIG_OPER -> OPER_NEG ASIG_OPER \n" +
             "ASIG_OPER -> token_par_izq ASIG_OPER token_par_der ASIG_OPER_ \n" +
@@ -776,7 +807,7 @@ class Grammar{
 
             "CASE -> caso CONDICION token_dosp COMMANDS \n" +
 
-            "_CASE -> CASE \n" +
+            "_CASE -> BODY_SEGUN \n" +
             "_CASE -> e \n" +
 
             "OTHERCASE -> e \n" +
@@ -819,7 +850,6 @@ class Grammar{
 
             "TIME_OPTION -> segundos \n" +
             "TIME_OPTION -> milisegundos \n"
-
             ;
 
 
@@ -977,7 +1007,6 @@ class Grammar{
                         temp = Primeros(line, i+1);
                         sigs[index].pred.addAll(temp);
                         sigs[index].pred.remove("e");
-
                     }
                     if(temp.contains("e") || line.length-1 - i == 0){
                         /*
@@ -993,8 +1022,6 @@ class Grammar{
                 }
             }
         }
-        //System.out.println("Sig( "+noTer+" ) = "+sigs[index].pred);
-        //System.out.println("----------------");
         return sigs[index].pred;
     }
     public boolean isLowerCase (String str){
@@ -1036,7 +1063,6 @@ class SintAn {
     public void analizeSintax(){
         if(tokenList.size() > 0){
             funcion("S");
-            //System.out.println("TOken: "+tokenList.get(index));
             if(!tokenList.get(index).tipo.equals("$")){
                 System.out.println("Error de terminal");
                 errorSintaxis(tokenList.get(index).tipo);
@@ -1073,22 +1099,14 @@ class SintAn {
                 }
             }
         }
-        //System.out.println("Contains: "+contains+ " No terminal: "+noTer+" recibido: "+tok.tipo);
         if(!contains){
-            //System.out.println("Error no se contiene el no terminal");
             errorSintaxis(tok, esperados);
         }
     }
 
     public void emparejar(String tokEsperado){
         Token tok = tokenList.get(index);
-        System.out.println();
-        System.out.println("Index: "+index+ " MaxIndex: "+(tokenList.size()-1));
-        System.out.println("Se esperaba: '"+tokEsperado+"'   -    se recibio: '"+tok.tipo+"'");
         if(tok.tipo.equals(tokEsperado)){
-            //Get next token
-            System.out.println("Correcto");
-            System.out.println();
             if(index < tokenList.size()-1)index = index+1;
         }else{
             errorSintaxis(tok, tokEsperado);
@@ -1102,15 +1120,12 @@ class SintAn {
 
     //Error de sintaxis no coincidencia funcion
     public void errorSintaxis(Token tok, HashSet<String> esperados){
-        System.out.println("Error de funcion");
-        System.out.println("Recibido: "+tok);
-        System.out.println("Esperados: "+esperados);
         ArrayList<String> esperados_list = new ArrayList<>(esperados);
         Collections.sort(esperados_list);
         if(esperados.contains("proceso") || esperados.contains("algoritmo")){
             System.out.print("Error sintactico: falta proceso");
         }else{
-            System.out.print("<"+tok.fila+","+tok.columna+"> Error sintactico: se encontro: \""+tok.dicTipoRev.get(tok.tipo)+"\"; se esperaba: ");
+            System.out.print("<"+tok.fila+":"+tok.columna+"> Error sintactico: se encontro: \""+tok.dicTipoRev.get(tok.tipo)+"\"; se esperaba: ");
             for(int i=0; i<esperados_list.size(); i++){
                 if(i == esperados_list.size()-1) System.out.print("\""+tok.dicTipoRev.get(esperados_list.get(i))+"\".");
                 else System.out.print("\""+tok.dicTipoRev.get(esperados_list.get(i))+"\", ");
@@ -1121,8 +1136,7 @@ class SintAn {
 
     //Error de sintaxis no coincidencia emparejar
     public void errorSintaxis(Token tok, String token){
-        System.out.println("Error de emparejamiento");
-        System.out.print("<"+tok.fila+","+tok.columna+"> Error sintactico: se encontro: \""+tok.dicTipoRev.get(tok.tipo)+"\"; se esperaba: \""+tok.dicTipoRev.get(token)+"\".");
+        System.out.print("<"+tok.fila+":"+(tok.columna)+"> Error sintactico: se encontro: \""+tok.dicTipoRev.get(tok.tipo)+"\"; se esperaba: \""+tok.dicTipoRev.get(token)+"\".");
         System.exit(0);
     }
 
@@ -1152,12 +1166,9 @@ public class Main {
         //lexical.printTokens();
         //Syntax analizer
         Grammar gram = new Grammar();
-
         //gram.printGrammar();
         gram.analizeGrammar();
-
         //System.out.println(gram.getNoTers());
-
         SintAn sintax = new SintAn(gram.getTransGrammar(), gram.getPred(), lexical.getTokenList());
         sintax.analizeSintax();
 

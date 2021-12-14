@@ -1,0 +1,46 @@
+Proceso Romanos
+    
+    // leer el x
+    Definir x como Numerico;
+    Escribir "Ingrese un x entre 1 y 1000";
+    Leer x;
+    
+    // controlar que sea valido para convertir
+    Definir SePuedeConvertir Como Logico;
+    SePuedeConvertir<-Verdadero;
+    Si x=0 Entonces
+        Escribir "No existe ningun simbolo para representar el 0";
+        SePuedeConvertir<-Falso;
+    FinSi
+    Si x<>trunc(x) Entonces
+        Escribir "El x debe ser entero";
+        SePuedeConvertir<-Falso;
+    FinSi
+    Si x>1000 Entonces
+        Escribir "Muy alto";
+        SePuedeConvertir<-Falso;
+    FinSi
+    Si x<0 Entonces
+        Escribir "Debe ser positivo";
+        SePuedeConvertir<-Falso;
+    FinSi
+    
+    // realizar la conversion
+    Si SePuedeConvertir Entonces        
+        Si x=1000 Entonces
+            Escribir "M";
+        Sino
+            Dimension nu[10], nd[10], nc[10]; // notacion para unidades, decenas y centenas
+            Definir nu,nd,nc Como Caracter;
+            nu(0)<-''; nu[1]<-'I'; nu[2]<-'II'; nu[3]<-'III'; nu[4]<-'IV'; nu[5]<-'V'; nu[6]<-'VI'; nu[7]<-'VII'; nu[8]<-'VIII'; nu[9]<-'IX';
+            nd[0]<-''; nd[1]<-'X'; nd[2]<-'XX'; nd[3]<-'XXX'; nd[4]<-'XL'; nd[5]<-'L'; nd[6]<-'LX'; nd[7]<-'LXX'; nd[8]<-'LXXX'; nd[9]<-'XC';
+            nc[0]<-''; nc[1]<-'C'; nc[2]<-'CC'; nc[3]<-'CCC'; nc[4]<-'CD'; nc[5]<-'D'; nc[6]<-'DC'; nc[7]<-'DCC'; nc[8]<-'DCCC'; nc[9]<-'CM';
+            Definir centenas,decenas,unidades como numero;
+            centenas<-trunc(x/100) MOD 10;
+            decenas<-trunc(x/10) MOD 10;
+            unidades<-x MOD 10;
+            Escribir nc[centenas],nd[decenas],nu[unidades];
+        FinSi
+    FinSi
+    
+FinProceso
